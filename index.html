@@ -1,0 +1,283 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>BLOG index with Qing </title>
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-siteapp"/>
+  <link rel="icon" type="image/png" href="assets/i/favicon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" sizes="192x192" href="assets/i/app-icon72x72@2x.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Amaze UI"/>
+  <link rel="apple-touch-icon-precomposed" href="assets/i/app-icon72x72@2x.png">
+  <meta name="msapplication-TileImage" content="assets/i/app-icon72x72@2x.png">
+  <meta name="msapplication-TileColor" content="#0e90d2">
+  <link rel="stylesheet" href="assets/css/amazeui.min.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+  <link rel="stylesheet" href="editor/css/editormd.css">
+  <link rel="stylesheet" href="editor/css/editormd.preview.css">
+  <style>
+	[v-cloak]{
+		display:none;
+	}
+   </style>
+</head>
+
+<body id="blog">
+
+<div id="app"> <!-- 自己定义的容器，为了能够在容器内访问vue对象-->
+
+<!-- nav start -->
+
+<hr>
+
+<!-- banner end -->
+
+<!-- content srart -->
+<div class="am-g am-g-fixed blog-fixed">
+    <div class="am-u-md-8 am-u-sm-12" v-show="status!='blog_edit'" v-cloak>
+	
+         <article class="am-g blog-entry-article" v-for="blog in blog_list">
+            <div class="am-u-lg-6 am-u-md-12 am-u-sm-12 blog-entry-img">
+                <img src="assets/i/测试图片2.jpg" alt="" class="am-u-sm-12">
+            </div>
+            <div class="am-u-lg-6 am-u-md-12 am-u-sm-12 blog-entry-text">
+                <span><a class="blog-color" v-if="tag_list.length > 0">{{get_tagname_by_tag_id(blog.tag_id)}}&nbsp;</a></span>
+                <span> ©{{author}} &nbsp;</span>
+                <span>{{blog.ctime}}</span>
+                <h1><a v-on:click="blog_view(blog.id)">{{blog.title}}</a></h1>
+				<span v-show="status=='blog_admin'">
+					<button type="button" class="am-btn am-btn-success" v-on:click="blog_delete(blog.id)">删除</button>
+					<button type="button" class="am-btn am-btn-danger" v-on:click="blog_edit(blog.id)">编辑</button>
+				</span>
+            </div>
+        </article>
+        
+        <ul class="am-pagination">
+			<li class="am-pagination-prev"><a v-on:click="into_admin_status">&laquo; 管理</a></li>
+			<li class="am-pagination-next"><a v-on:click="edit_test()">新增 &raquo;</a></li> 
+		</ul>
+    </div>
+	 <div class="am-u-md-12 am-u-sm-12" v-show="status=='blog_edit'"v-cloak>
+		<div class="am-input-group">
+			<span class="am-input-group-label">博客标题</span>
+			<input type="text" class="am-form-field" v-model="show_blog.title">
+		</div>
+
+		<div id="test-editormd" >
+			<textarea style="display:none;">{{show_blog.content}}</textarea>
+		</div>
+		
+		<div id="test" >
+			<textarea style="display:none;">
+			#### Disabled options		
+			</textarea>
+		</div>
+		
+		<span v-show="status=='blog_edit'&&status_bool=='view'">
+			<button type="button" class="am-btn am-btn-danger" v-on:click="blog_update()">提交</button>
+		</span>
+		<span v-show="status_in=='yes_insert'">
+			<button type="button" class="am-btn am-btn-danger" v-on:click="blog_insert()">提交</button>
+		</span>
+	</div>
+
+    <div class="am-u-md-4 am-u-sm-12 blog-sidebar" v-show="status!='blog_edit'" v-cloak>
+        <div class="blog-sidebar-widget blog-bor">
+            <h2 class="blog-text-center blog-title"><span>{{author}}</span></h2>
+            <img src="assets/i/测试图片.jpg" alt="about me" class="blog-entry-img" >
+            <p>Qing</p>
+            <p>
+   
+        </p><p>We are young and reckless</p>
+        </div>
+    
+        <div class="blog-clear-margin blog-sidebar-widget blog-bor am-g ">
+            <h2 class="blog-title"><span>TAG cloud</span></h2>
+            <div class="am-u-sm-12 blog-clear-padding">
+            <a href="#" class="blog-tag" v-for="tag in tag_list">{{tag.name}}</a>
+            </div>
+        </div>   
+    </div> 	
+</div>
+<!-- content end -->
+  <footer class="blog-footer">
+    <div class="am-g am-g-fixed blog-fixed am-u-sm-centered blog-footer-padding"></div>     
+    <div class="blog-text-center">© 2021 By {{author}}</div>     
+  </footer>
+
+</div> <!--自定义的容器结尾-->
+
+
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/amazeui.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="editor/editormd.min.js"></script>	
+<script src="editor/lib/marked.min.js"> </script>
+<script src="editor/lib/prettify.min.js"> </script>
+<script src="editor/lib/raphael.min.js"> </script>
+<script src="editor/lib/underscore.min.js"> </script>
+<script src="editor/lib/sequence-diagram.min.js"> </script>
+<script src="editor/lib/flowchart.min.js"> </script>
+<script src="editor/lib/jquery.flowchart.min.js"> </script>
+<script src="editor/editormd.js"> </script>
+
+<script>
+	var app = new Vue({
+	//var testEditor;
+		el: '#app',
+		data: {
+			author: 'Qing',
+			status: 'blog_list', //blog_list,blog_new,blog_admin,blog_edit
+			status_bool: 'view', //在查看博客时，不显示提交按钮
+			status_in: 'insert', //添加博客时，显示提交按钮
+			tag_list:[], //标签信息 id,name
+			blog_list:[], //博客信息 id,tag_id,title,content,ctime
+			show_blog:{id:null,tag_id:null,title:null,content:null,ctime:null}
+		},
+		methods:{ 
+			get_blog_list:function(){
+				$.ajax({
+					url:"/blog",//请求中的path路径
+					type:"get", //请求中的请求方法
+					context:this, //设置请求成功后回调函数中的this指针-当前的this指针是vue赋值
+					success:function(result){
+						this.blog_list = result;//成功后将响应正文的json串赋值
+					}
+				})
+			},
+			get_tag_list:function(){
+				$.ajax({ 
+					url:"/tag",
+					type:"get",
+					context: this,
+					success: function(result){
+						this.tag_list = result;//成功后响应正文的json串赋值
+					}
+				})
+			},
+			get_tagname_by_tag_id: function(tag_id){
+				for(idx in this.tag_list){
+					if(this.tag_list[idx].id == tag_id){
+						return this.tag_list[idx].name;
+				}
+			}
+				return "未知"
+			},
+			into_admin_status: function(){
+				this.status = 'blog_admin';//使用this，不然会被认为定义局部变量
+			},
+			blog_delete:function(blog_id){
+				$.ajax({
+					url:"/blog/"+ blog_id,
+					type:"delete",
+					context:this,
+					success:function(result){
+						this.get_blog_list();//更新数据
+						
+					}
+				}) 
+			},
+			blog_edit:function(blog_id){
+				
+				$.ajax({
+					url:"/blog/"+ blog_id,
+					type:"get",
+					context:this,
+					success:function(result){
+						this.show_blog = result;
+						this.status = 'blog_edit';
+					//显示一个博客的编辑页面，其中具有博客的内容
+						testEditor = editormd({
+							id:"test-editormd",
+							width:"100%",
+							heigth:640,
+							path:"editor/lib/"
+						});
+					}
+				})
+			},
+			edit_test:function(){
+			$.ajax({
+					url:"/blog",
+					type:"post",
+					context:this,
+					success:function(result){
+						testEditor = editormd({
+								id:"test",
+								width:"100%",
+								heigth:640,
+								path:"editor/lib/"
+							});
+						
+					}
+				}) 
+				
+			},
+			blog_insert:function(){
+			
+				
+				$.ajax({
+					url:"/blog/",
+					type:"post",
+					context:this,
+					data: JSON.stringify(this.show_blog),
+					success:function(result){
+						this.get_blog_list();//更新数据
+						this.status = 'blog_list';
+					}
+				}) 
+				
+			},
+			blog_update:function(){
+				this.show_blog.content = testEditor.getMarkdown();
+				$.ajax({ 
+					url:"/blog/"+ this.show_blog.id,
+					type:"put",
+					context:this,
+					//将序列化后的字符串放到正文中
+					data: JSON.stringify(this.show_blog),
+					success:function(result){
+						this.get_blog_list();
+						this.status = 'blog_list';
+						
+					}
+				})
+			},
+			blog_view:function(blog_id){
+				$.ajax({
+					url:"/blog/"+blog_id,
+					type:"get",
+					context:this,
+					success:function(result){
+						this.show_blog = result;//更新数据
+						this.status = 'blog_edit';
+						this.status_bool = 'no_view';
+						testEditormdView = editormd.markdownToHTML("test-editormd",{
+							markdown:this.show_blog.content,
+							htmlDecode:"style,script,iframe",
+							tocm:true,
+							emoji:true,
+							taskList:true,
+							tex:true,
+							flowChart:true,
+							sequenceDiagram:true,
+							});
+					}
+				})
+			}
+		}	
+	});
+	//异步操作 有先后顺序
+	app.get_tag_list();
+	app.get_blog_list();//浏览器获取到界面之后，就会调用这两个函数，向后台发送请求
+	
+</script>
+</body>
+</html>
